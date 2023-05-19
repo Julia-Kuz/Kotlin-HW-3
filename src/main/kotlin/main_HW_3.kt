@@ -2,7 +2,7 @@ fun main() {
     // Задача 1
     println(agoToText(32400))
     // Задача 2
-    println("Комиссия составляет (руб.): " + fee("Maestro", sumTransfer = 80000))
+    println(fee(sumMonth = 30_000, sumTransfer = 2_000))
 }
 
 // Задача 1
@@ -44,13 +44,45 @@ fun grammarHour(time: Int): String {
 
 // Задача 2
 
-fun fee(card: String = "VK Pay", sumMonth: Int = 0, sumTransfer: Int): Double {
+fun fee(card: String = "VK Pay", sumMonth: Int = 0, sumTransfer: Int): String {
     val minFee = 35.0
     val sumLimit = 75000
+    val limitTransferMonth = 600_000
+    val limitTransferOnce = 150_000
+    val limitTransferMonthVK = 40_000
+    val limitTransferOnceVK = 15_000
+
     return when (card) {
-        "MasterCard", "Maestro" -> if ((sumTransfer + sumMonth) < sumLimit) 0.0 else sumTransfer * 0.06 / 100 + 20
-        "Visa", "Мир" -> if (sumTransfer * 0.75 / 100 < minFee) minFee else sumTransfer * 0.75 / 100
-        else -> 0.0
+        "MasterCard", "Maestro" ->
+            when {
+                (sumTransfer + sumMonth) < limitTransferMonth && sumTransfer < limitTransferOnce ->
+                    if ((sumTransfer + sumMonth) < sumLimit) "Комиссия составляет (руб.): " + 0.0 else "Комиссия составляет (руб.): " + sumTransfer * 0.06 / 100 + 20
+
+                else -> "Превышен лимит перевода"
+            }
+
+        "Visa", "Мир" ->
+            when {
+                (sumTransfer + sumMonth) < limitTransferMonth && sumTransfer < limitTransferOnce ->
+                    if (sumTransfer * 0.75 / 100 < minFee) "Комиссия составляет (руб.): $minFee" else "Комиссия составляет (руб.): " + sumTransfer * 0.75 / 100
+
+                else -> "Превышен лимит перевода"
+            }
+
+        else ->
+            when {
+                (sumTransfer + sumMonth) < limitTransferMonthVK && sumTransfer < limitTransferOnceVK -> "Комиссия составляет (руб.): " + 0.0
+                else -> "Превышен лимит перевода"
+            }
     }
 }
+
+
+//    без проверки на лимиты
+//    return when (card) {
+//        "MasterCard", "Maestro" -> if ((sumTransfer + sumMonth) < sumLimit) 0.0 else sumTransfer * 0.06 / 100 + 20
+//        "Visa", "Мир" -> if (sumTransfer * 0.75 / 100 < minFee) minFee else sumTransfer * 0.75 / 100
+//        else -> 0.0
+//    }
+
 
